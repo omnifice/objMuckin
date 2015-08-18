@@ -1,0 +1,25 @@
+@charset "utf-8";
+
+/* ############################# MAIN ########################################*/
+
+body {
+  margin: 0px;
+  padding: 0px;
+  min-width: 800px;
+  color: #333;
+  background-color: #fff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+}
+
+
+#topMsg {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+
+#magicHappens {
+  /* */
+}
+
