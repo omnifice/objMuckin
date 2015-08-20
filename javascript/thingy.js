@@ -1,13 +1,14 @@
 //
 // thingy.js - Very base object...it's a thingy.
 //
-// If parent element is passed to the constructor, this.physical == jQuery object,
+// If anchor element is passed to the constructor, this.physical == jQuery object,
 // otherwise, it's just the string representation of the object.
 //
 
 
 // Constructor
 var Thingy = function(opts) {
+  
   if (typeof opts === 'undefined') {
     throw('Thingy::opts is undefined.');
   }
@@ -18,27 +19,29 @@ var Thingy = function(opts) {
   
   this.id = opts.id;
   this.name = opts.name || '';
+  this.visible = opts.visible || false;
   this.cssClass = 'thingy';
-  this.iconCool = 'icon-cool.png';
-  this.iconNormal = 'icon-blank.png';
-  this.iconPath = 'images';
-  this.iconSushi = 'icon-sushi.png';
-  this.parent = '';
+  this.anchor = '';
   this.physical = '';
 
-  // After icon definitions!!!
-  this.emotions = { normal: this.iconNormal, cool: this.iconCool, sushi: this.iconSushi };
+  this.iconCool = 'icon-cool.png';
+  this.iconDefault = opts.defaultIcon || 'icon-blank.png'; 
+  this.iconPath = 'images';
+  this.iconSushi = 'icon-sushi.png';
+  this.emotions = { defaultIcon: this.iconDefault, cool: this.iconCool, sushi: this.iconSushi };
 
-  // TODO: check if opts.parent is a string???
-  if (typeof opts.parent !== 'undefined' && $(opts.parent).length == 1) {
-    this.parent = opts.parent;
-    this.attach(this.parent);
+  // TODO: check if opts.anchor is a string???
+  if (typeof opts.anchor !== 'undefined' && $(opts.anchor).length == 1) {
+    this.anchor = opts.anchor;
   }
-  else if ($(opts.parent).length > 1) {
-    console.log('Thingy::The specified parent is more than one element. Cannot attach to it.');
+  else if ($(opts.anchor).length > 1) {
+    console.log('Thingy::The specified anchor is more than one element. Cannot attach to it.');
+  }
+  else if (typeof opts.anchor === 'undefined') {
+    //
   }
   else {
-    console.log('Thingy::The specified parent does not exist. Not attaching.');
+    console.log('Thingy::The specified anchor does not exist. Not attaching.');
   }
   
   this.build();
@@ -50,13 +53,14 @@ Thingy.prototype = {
   
   // Build it.
   build: function() {
-    var el = '<div data-id="' + this.id + '" class="' + this.cssClass + '">'
-           + '<img src="' + this.imgPath(this.iconNormal) + '">'
+    var display = (this.visible === true) ? '' : ' style="display: none;"';
+    var el = '<div data-id="' + this.id + '" class="' + this.cssClass + '"' + display + '>'
+           + '<img src="' + this.imgPath(this.iconDefault) + '">'
            + '</div>';
     
-    if (this.parent != '') {
+    if (this.anchor != '') {
       this.physical = $(el);
-      $(this.parent).append(el);
+      $(this.anchor).append(el);
     }
     else {
       this.physical = el;
@@ -65,21 +69,21 @@ Thingy.prototype = {
   
   show: function() {
     if (typeof this.physical === 'string') {
-      console.log('Thingy::show:Cannot show this thingy...not a DOM element. Did you pass a parent to the constructor?');
+      console.log('Thingy::show:Cannot show this thingy...not a DOM element. Did you pass an anchor to the constructor?');
       return false;
     }
     else {
-      $(this.physical).show();
+      $('[data-id="' + this.id + '"]').show();
     }
   },
   
   hide: function() {
     if (typeof this.physical === 'string') {
-      console.log('Thingy::hide:Cannot hide this thingy...not a DOM element. Did you pass a parent to the constructor?');
+      console.log('Thingy::hide:Cannot hide this thingy...not a DOM element. Did you pass an anchor to the constructor?');
       return false;
     }
     else {
-      $(this.physical).hide();
+      $('[data-id="' + this.id + '"]').hide();
     }
   },
   
@@ -95,7 +99,7 @@ Thingy.prototype = {
         mod = $(this.physical);
       }
       else {
-        mod = $(this.parent).find('div[data-id="' + this.id + '"]');
+        mod = $(this.anchor).find('div[data-id="' + this.id + '"]');
       }
       
       $(mod).find('img').attr('src', this.imgPath(this.emotions[type]));
@@ -109,18 +113,19 @@ Thingy.prototype = {
     }
   },
   
-  attach: function(parent) { // TODO: need to make sure the parent is a string???
-    if (this.parent == '') {
-      if ($(parent).length == 1) {
-        $(parent).append(this.physical);
-        this.parent = parent;
+  attach: function(anchor) { // TODO: need to make sure the anchor is a string???
+    if (this.anchor == '') {
+      if ($(anchor).length == 1) {
+        $(anchor).append(this.physical);
+        this.anchor = anchor;
+        this.physical = $(this.physical);
       }
       else {
-        console.log('Thingy::attach::Either zero elements, or more than one element exists for specified parent. Cannot attach.');
+        console.log('Thingy::attach::Either zero elements, or more than one element exists for specified anchor. Cannot attach.');
       }
     }
     else {
-      console.log('Thingy::attach::Cannot attach to ' + parent + '. Already attached to: ' + this.parent);
+      console.log('Thingy::attach::Cannot attach to ' + anchor + '. Already attached to: ' + this.anchor);
     }
   },
   
